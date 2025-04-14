@@ -23,6 +23,11 @@ attack_index = 0
 row_index = 0
 column_index = 0
 
+def ShipCheck():
+    #This will be where the program will check to see if all segments of any ship have been hit. If so, then it will print out "You sank (opposite player)'s (specific ship)."
+    #The program will then check if all of the enemy player's ships have been sunk, determining a game end or not.
+    pass
+
 def RowCheck():
     valid_row = False
     while valid_row != True:
@@ -93,3 +98,24 @@ while valid_coords != True:
     else:
         print("Please input valid coordinates.")
         row_input = input("Please input a row letter.")
+        RowCheck()
+        column_input = input("Please input a column number.")
+        ColumnCheck()
+#p1 attack sequence
+if p2_grid[attack_index] == "[ ]":
+    print() #insert "miss" message
+    p1_attack_grid[attack_index] = "[O]"
+else:
+    print() #insert hit message
+    p1_attack_grid[attack_index] = "[X]"
+    p2_grid[attack_index] = "[X]"
+ShipCheck()
+#p2 attack sequence
+if p1_grid[attack_index] == "[ ]":
+    print() #insert "miss" message
+    p2_attack_grid[attack_index] = "[O]"
+else:
+    print() #insert hit message
+    p2_attack_grid[attack_index] = "[X]"
+    p1_grid[attack_index] = "[X]"
+ShipCheck()
