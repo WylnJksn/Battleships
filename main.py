@@ -1,3 +1,4 @@
+import player_grids
 import string
 Ships = {
     "Carrier": 5,
@@ -7,30 +8,130 @@ Ships = {
     "Destroyer": 2,
 }
 
-#Makes sure the index is 2-3 characters long
-def coord_to_index(coord):
-    if len(coord) <2 or len(coord) >3:
-        return "Invalid entry"
-#Takes first letter and checks if its a valid row
-    row_letter = coord[0].upper()
-    if row_letter not in string.ascii_uppercase[:10]:
-        return "Invalid row"
-#Checks if the other characters are numbers (the "2" in "A2")
-    if not coord[1:].isdigit():
-        return None
-#Converts the string number to and integer and subtracts 1    
-    col = int(coord[1:]) - 1
-    if not (0 <= col <=9):
-        return None
-#Converts the index letters into row numbers 0-9   
-    row = string.ascii_uppercase.index(row_letter)
-    return row * 10 + col
+
+
+p1_total_segments = 0
+p2_total_segments = 0
+
+
+
+
+def get_valid_row():
+    while True:
+        row_input = input("Enter row (A-J): ").upper()
+        if row_input in string.ascii_uppercase[:10]:
+            return string.ascii_uppercase.index(row_input)
+        print("Invlaid row")
+def get_valid_column():
+    while True:
+        col_input = input("Enter row (1-10): ")
+        if col_input.isdigit():
+            col = int(col_input)
+            if 1 <= col <= 10:
+                return col - 1
+        print("Invalid column.")
+
+def place_ship(grid, ship_length, name):
+    while True:
+        print(f"\nPlacing {name} (length {ship_length})")
+        row = get_valid_row()
+        col = get_valid_column()
+        direction = input("Direction (H or V): ").upper()
+
+        if direction == "H":
+            if col + ship_length >10:
+                print("Ship doesn't fit horizontally.")
+                continue
+            if any(grid[row *10 + col + i] != "[]" for i in range(ship_length)):
+                print("Overlap detected.")
+                continue
+            for i in range(ship_length):
+                grid[row * 10 +col + i] = "[#]"
+                break
+        elif direction == "V":
+            if row + ship_length >10:
+                print("Ship doesn't fit vertically.")
+                continue
+            if any(grid[(row+i) * 10 + col] != "[]" for i in range(ship_length)):
+                print("Overlap detected.")
+                continue
+            for i in range(ship_length):
+                grid[(row + i) * 10 + col] = "[#]"
+            break
+        else:
+            print("Invalid direction")
+            
+
+
+
+
+print("Player 1: Place your ships")
+for name, length in Ships.items():
+    place_ship(p1_grid, length, name)
+p1_total_segments = p1_grid.count("[#]")
+
+
+
+print("\nPlayer 2: PLace your ships")
+for name, length in Ships.items():
+    place_ship(p2_grid, length, name)
+p2_total_segments = p2_grid.count("[#]")
+
+
+
+
+
+while True:
+    attack(p1_attack_grid, p2_grid, "Player 1")
+    attack(p2_attack_grid, p1_grid, "Player 2")
 
 
 
 
 
 
+def ShipCheck():
+    global p1_total_segments, p2_total_segments
+    p1_remaining = p1_grid.count("[#]")
+    p2_remaining = p2_grid.count("[#]")
+
+    if p2_remaining < p2_total_segments:
+        print("You hit Player 2's ship!")
+        p2_total_segments = p2_remaining
+    
+    if p1_remaining < p1_total_segments:
+        print("You hit Player 1's Ship!")
+        p1_total_segments = p1_remaining
+
+    if p1_remaining == 0:
+        print("🎉 Player 2 WINS! All Player 1's ships are sunk.")
+        exit()
+
+    if p2_remaining == 0:
+        print("🎉 Player 1 WINS! All Player 2's ships are sunk.")
+        exit()
+    
+
+def attack(attacker_grid, defender_grid, player_name):
+    print(f"\n{player_name}'s turn to attack.")
+    while True:
+        row = get_valid_row()
+        col = get_valid_column()
+        index = row * 10 + col
+
+        if attacker_grid[index] in ["[X]", "[O]"]:
+            print("You've already attacked here.")
+        
+        if defender_grid[index] == "[#]":
+            print("Hit!")
+            attacker_grid[index] = "[X]"
+            defender_grid[index] = "[X]"
+        else:
+            print("Miss.")
+            attacker_grid[index] = "[O]"
+        break
+
+    ShipCheck()
 
 
 
