@@ -13,6 +13,13 @@ Ships = {
 p1_total_segments = 0
 p2_total_segments = 0
 
+print("Welcome to Battleship!")
+
+# Get player names
+player1_name = input("Player 1, please enter your name: ")
+player2_name = input("Player 2, please enter your name: ")
+
+print(f"\nWelcome, {player1_name} and {player2_name}!")
 
 
 
@@ -65,14 +72,14 @@ def place_ship(grid, ship_length, name):
 
 
 
-print("Player 1: Place your ships")
+print(f"\n{player1_name}, place your ships:")
 for name, length in Ships.items():
     place_ship(p1_grid, length, name)
 p1_total_segments = p1_grid.count("[#]")
 
 
 
-print("\nPlayer 2: PLace your ships")
+print(f"\n{player2_name}, place your ships:")
 for name, length in Ships.items():
     place_ship(p2_grid, length, name)
 p2_total_segments = p2_grid.count("[#]")
@@ -80,13 +87,7 @@ p2_total_segments = p2_grid.count("[#]")
 
 
 
-
-while True:
-    attack(p1_attack_grid, p2_grid, "Player 1")
-    attack(p2_attack_grid, p1_grid, "Player 2")
-
-
-
+print(f"{player1_name}, it's your turn to attack!")
 
 
 
@@ -104,16 +105,16 @@ def ShipCheck():
         p1_total_segments = p1_remaining
 
     if p1_remaining == 0:
-        print("🎉 Player 2 WINS! All Player 1's ships are sunk.")
+        print(f"\nCongratulations {player1_name}, you win! All of {player2_name}'s ships are sunk.")
         exit()
 
     if p2_remaining == 0:
-        print("🎉 Player 1 WINS! All Player 2's ships are sunk.")
+        print(f"\nCongratulations {player2_name}, you win! All of {player1_name}'s ships are sunk.")
         exit()
     
 
-def attack(attacker_grid, defender_grid, player_name):
-    print(f"\n{player_name}'s turn to attack.")
+def attack(attacker_grid, defender_grid, attacker_name):
+    print(f"\n{attacker_name}'s turn to attack.")
     while True:
         row = get_valid_row()
         col = get_valid_column()
@@ -121,22 +122,25 @@ def attack(attacker_grid, defender_grid, player_name):
 
         if attacker_grid[index] in ["[X]", "[O]"]:
             print("You've already attacked here.")
+            return False
         
         if defender_grid[index] == "[#]":
-            print("Hit!")
+            print(f"Hit! {attacker_name} struck the enemy ship!")
             attacker_grid[index] = "[X]"
             defender_grid[index] = "[X]"
         else:
-            print("Miss.")
+            print(f"Miss! {attacker_name} missed this time.")
             attacker_grid[index] = "[O]"
-        break
+        return True
 
     ShipCheck()
 
 
 
 
-
+while True:
+    attack(p1_attack_grid, p2_grid, "Player 1")
+    attack(p2_attack_grid, p1_grid, "Player 2")
 
 
 
