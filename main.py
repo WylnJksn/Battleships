@@ -2,7 +2,7 @@ import os
 import string
 
 # ASCII art
-asciihit = """                  ....         .....         ...    ..+*-.     .....                      
+asciihit = """                  ....          .....         ...    ..+*-.     .....                      
                             :#########+.     -#####-      :####=  +######:   +#####.                     
                         .+###+=====+*#=.-++#########-..=##**######*+###*###*+#####:  ..                
                       .+#*===::-=====*####++===++*####*++=++*##*+====*###+===+###+:-##+.              
@@ -47,9 +47,8 @@ asciihit = """                  ....         .....         ...    ..+*-.     ...
         .*#=========:...:=-:...:-.....:-......:=-.....-=-.....-==:.........--:........-=:......:--:..:==#*.
         .*#+====:.:===.........................:-...............--.....................-:..............==#*.
         .+*==:::....::..................................................................................:**."""
-
-
-asciimiss = """                                 :-:....:                                                      
+asciimiss = """                                                       
+                                                :-:....:                                                      
                                                 :-:...::                                                      
                                                  -=...:                                                       
                             .:...                                                                             
@@ -97,12 +96,13 @@ def get_valid_column():
                 return col - 1
         print("Invalid column.")
 
-def place_ship(grid, ship_length, name):
+def place_ship(grid, ship_length, name, ship_segments):
     while True:
         print(f"\nPlacing {name} (length {ship_length})")
         row = get_valid_row()
         col = get_valid_column()
         direction = input("Direction (H or V): ").upper()
+        positions = set()
 
         if direction == "H":
             if col + ship_length > 10:
@@ -113,6 +113,8 @@ def place_ship(grid, ship_length, name):
                 continue
             for i in range(ship_length):
                 grid[row * 10 + col + i] = "[#]"
+                positions.add(row * 10 + col + i)
+            ship_segments[name] = positions
             break
         elif direction == "V":
             if row + ship_length > 10:
@@ -123,9 +125,19 @@ def place_ship(grid, ship_length, name):
                 continue
             for i in range(ship_length):
                 grid[(row + i) * 10 + col] = "[#]"
+                positions.add((row + i) * 10 + col)
+            ship_segments[name] = positions
             break
         else:
             print("Invalid direction.")
+
+def check_if_ship_sunk(ship_segments, defender_grid, defender_name):
+    for ship, positions in ship_segments.items():
+        if not positions:
+            continue  # Already reported sunk
+        if all(defender_grid[pos] == "[X]" for pos in positions):
+            print(f"\n*** {defender_name}'s {ship} has been sunk! ***")
+            ship_segments[ship] = set()  # Prevent repeated messages
 
 def ShipCheck():
     global p1_total_segments, p2_total_segments
@@ -148,7 +160,7 @@ def ShipCheck():
         print(f"\nCongratulations {player2_name}, you win! All of {player1_name}'s ships are sunk.")
         exit()
 
-def attack(attacker_grid, defender_grid, attacker_name):
+def attack(attacker_grid, defender_grid, attacker_name, defender_name, defender_ship_segments):
     print(f"\n{attacker_name}'s turn to attack.")
     while True:
         row = get_valid_row()
@@ -163,6 +175,7 @@ def attack(attacker_grid, defender_grid, attacker_name):
             print(f"Hit! {attacker_name} struck the enemy ship! {asciihit}")
             attacker_grid[index] = "[X]"
             defender_grid[index] = "[X]"
+            check_if_ship_sunk(defender_ship_segments, defender_grid, defender_name)
         else:
             print(f"Miss! {attacker_name} missed. {asciimiss}")
             attacker_grid[index] = "[O]"
@@ -190,6 +203,9 @@ p1_attack_grid = basic_grid[:]
 p2_grid = basic_grid[:]
 p2_attack_grid = basic_grid[:]
 
+p1_ship_segments = {}
+p2_ship_segments = {}
+
 Ships = {
     "Carrier": 5,
     "Battleship": 4,
@@ -210,24 +226,26 @@ player2_name = input("Player 2, please enter your name: ")
 # Player 1 places ships
 print(f"\n{player1_name}, place your ships.")
 for ship_name, ship_length in Ships.items():
-    place_ship(p1_grid, ship_length, ship_name)
+    place_ship(p1_grid, ship_length, ship_name, p1_ship_segments)
     print_grid(p1_grid)
 
 # Player 2 places ships
 print(f"\n{player2_name}, place your ships.")
 for ship_name, ship_length in Ships.items():
-    place_ship(p2_grid, ship_length, ship_name)
+    place_ship(p2_grid, ship_length, ship_name, p2_ship_segments)
     print_grid(p2_grid)
 
 # Main game loop
 while True:
-    attack(p1_attack_grid, p2_grid, player1_name)
+    attack(p1_attack_grid, p2_grid, player1_name, player2_name, p2_ship_segments)
     ShipCheck()
+    print(f"\n{player1_name}'s attack grid:")
     print_grid(p1_attack_grid)
-    attack(p2_attack_grid, p1_grid, player2_name)
-    ShipCheck()
-    print_grid(p2_attack_grid)
 
+    attack(p2_attack_grid, p1_grid, player2_name, player1_name, p1_ship_segments)
+    ShipCheck()
+    print(f"\n{player2_name}'s attack grid:")
+    print_grid(p2_attack_grid)
 
 
 
