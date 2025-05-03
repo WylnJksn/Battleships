@@ -35,6 +35,10 @@ def ShipCheck():
     #The program will then check if all of the enemy player's ships have been sunk, determining a game end or not.
     pass
 
+def transition_to_next_turn():
+    input("\nPress Enter to end your turn and pass to the next player...")
+    clear_terminal()
+
 def RowCheck(row_input):
     valid_row = False
     #I know for a fact this is inefficient. But if it works it works, I guess. I just gotta not make it a habit.

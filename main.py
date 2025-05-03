@@ -80,6 +80,10 @@ asciimiss = """
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def transition_to_next_turn():
+    input("\nPress Enter to end your turn and pass to the next player...")
+    clear_terminal()
+
 def get_valid_row():
     while True:
         row_input = input("Enter row (A-J): ").upper()
@@ -228,12 +232,14 @@ print(f"\n{player1_name}, place your ships.")
 for ship_name, ship_length in Ships.items():
     place_ship(p1_grid, ship_length, ship_name, p1_ship_segments)
     print_grid(p1_grid)
+transition_to_next_turn()
 
 # Player 2 places ships
 print(f"\n{player2_name}, place your ships.")
 for ship_name, ship_length in Ships.items():
     place_ship(p2_grid, ship_length, ship_name, p2_ship_segments)
     print_grid(p2_grid)
+transition_to_next_turn()
 
 # Main game loop
 while True:
@@ -241,12 +247,13 @@ while True:
     ShipCheck()
     print(f"\n{player1_name}'s attack grid:")
     print_grid(p1_attack_grid)
+    transition_to_next_turn()
 
     attack(p2_attack_grid, p1_grid, player2_name, player1_name, p1_ship_segments)
     ShipCheck()
     print(f"\n{player2_name}'s attack grid:")
     print_grid(p2_attack_grid)
-
+    transition_to_next_turn()
 
 
 
