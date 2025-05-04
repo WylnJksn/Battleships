@@ -83,6 +83,7 @@ def clear_terminal():
 def transition_to_next_turn():
     input("\nPress Enter to end your turn and pass to the next player...")
     clear_terminal()
+    input("\nNext player, press Enter to start your turn...")
 
 def get_valid_row():
     while True:
@@ -173,7 +174,7 @@ def attack(attacker_grid, defender_grid, attacker_name, defender_name, defender_
 
         if attacker_grid[index] in ["[X]", "[O]"]:
             print("You've already attacked here.")
-            return False
+            continue
 
         if defender_grid[index] == "[#]":
             print(f"Hit! {attacker_name} struck the enemy ship! {asciihit}")
@@ -243,12 +244,20 @@ transition_to_next_turn()
 
 # Main game loop
 while True:
+    print(f"\n{player1_name}'s grid:")
+    print_grid(p1_grid)
+    print(f"\n{player1_name}'s attack grid:")
+    print_grid(p1_attack_grid)
     attack(p1_attack_grid, p2_grid, player1_name, player2_name, p2_ship_segments)
     ShipCheck()
     print(f"\n{player1_name}'s attack grid:")
     print_grid(p1_attack_grid)
     transition_to_next_turn()
 
+    print(f"\n{player2_name}'s grid:")
+    print_grid(p2_grid)
+    print(f"\n{player2_name}'s attack grid:")
+    print_grid(p2_attack_grid)
     attack(p2_attack_grid, p1_grid, player2_name, player1_name, p1_ship_segments)
     ShipCheck()
     print(f"\n{player2_name}'s attack grid:")
